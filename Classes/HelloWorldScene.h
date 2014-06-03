@@ -24,6 +24,9 @@ public:
 private:
     CustomCommand _customCommand;
     
+    GLuint vao;
+    GLuint vertexVBO;
+    GLuint colorVBO;
 };
 
 #endif // __HELLOWORLD_SCENE_H__
