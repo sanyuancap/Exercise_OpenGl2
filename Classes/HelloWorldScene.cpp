@@ -27,7 +27,16 @@ bool HelloWorld::init()
         return false;
     }
   
-    this->setGLProgram(GLProgramCache::getInstance()->getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR));
+    //create my own program
+    auto program = new GLProgram;
+    program->initWithFilenames("myVertextShader.vert", "myFragmentShader.frag");
+    program->link();
+    //set uniform locations
+    program->updateUniforms();
+    
+    
+//    this->setGLProgram(GLProgramCache::getInstance()->getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR));
+    this->setGLProgram(program);
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -35,17 +44,27 @@ bool HelloWorld::init()
     glGenBuffers(1, &vertexVBO);
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
     
+    float vertercies[] = { -1,-1,
+        1, -1,
+        0, 1};
+    
+    float color[] = { 0, 1,0, 1,  1,0,0, 1, 0, 0, 1, 1};
+    
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertercies), vertercies, GL_STATIC_DRAW);
+
     
     glGenBuffers(1, &colorVBO);
     glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
+    
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+
+    
     return true;
 }
 
 void HelloWorld::visit(cocos2d::Renderer *renderer, const Mat4 &transform, bool transformUpdated)
 {
     Layer::draw(renderer, transform, transformUpdated);
-    
-    
     
     //send custom command to tell the renderer to call opengl commands
     _customCommand.init(_globalZOrder);
@@ -57,10 +76,14 @@ void HelloWorld::visit(cocos2d::Renderer *renderer, const Mat4 &transform, bool 
 
 void HelloWorld::onDraw()
 {
+    //question1: why the triangle goes to the up side
     
     auto glProgram = getGLProgram();
     
     auto director = Director::getInstance();
+    
+    glProgram->use();
+    
     
     director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
     director->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
@@ -69,10 +92,9 @@ void HelloWorld::onDraw()
     director->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
     
     
-    
-    glProgram->use();
-
+    //set uniform values, the order of the line is very important
     glProgram->setUniformsForBuiltins();
+   
     
     
     auto size = Director::getInstance()->getWinSize();
@@ -83,25 +105,21 @@ void HelloWorld::onDraw()
     
     //nomalize the position
     // -1 ~ 1
-    float vertercies[] = { -1,-1,
-    1, -1,
-    0, 1};
-    
-    float color[] = { 0, 1,0, 1,  1,0,0, 1, 0, 0, 1, 1};
+   
     
     
     
 //    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POSITION | GL::VERTEX_ATTRIB_FLAG_COLOR);
     
+    glBindVertexArray(vao);
+    
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertercies), vertercies, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     
     glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
