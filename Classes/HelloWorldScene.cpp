@@ -53,14 +53,27 @@ bool HelloWorld::init()
     float color[] = { 0, 1,0, 1,  1,0,0, 1, 0, 0, 1, 1};
     
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertercies), vertercies, GL_STATIC_DRAW);
+    GLuint positionLocation = glGetAttribLocation(program->getProgram(), "a_position");
+    CCLOG("position =%d", positionLocation);
+    glEnableVertexAttribArray(positionLocation);
+    //the following calls not equal to  glEnableVertexAttribArray
+    //    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POSITION);
+    glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
     
+    //set for color
     glGenBuffers(1, &colorVBO);
     glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-    
     glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
-
     
+    GLuint colorLocation = glGetAttribLocation(program->getProgram(), "a_color");
+    glEnableVertexAttribArray(colorLocation);
+    //the following calls not equal to  glEnableVertexAttribArray
+    //    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_COLOR);
+    glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+
+   
+// 使用vao    http://blog.sina.com.cn/s/blog_4a657c5a01016f8s.html
     return true;
 }
 
@@ -100,30 +113,8 @@ void HelloWorld::onDraw()
     
     auto size = Director::getInstance()->getWinSize();
     
-//    float vertercies[] = { 0,0,
-//        size.width, 0,
-//        size.width / 2, size.height};
-    
-    
-    
-//    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POSITION | GL::VERTEX_ATTRIB_FLAG_COLOR);
-    
+    //use vao
     glBindVertexArray(vao);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-//    glEnableVertexAttribArray(0);
-    //the following calls not equal to  glEnableVertexAttribArray
-    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POSITION);
-    glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
-    
-    glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-    glEnableVertexAttribArray(1);
-    //the following calls not equal to  glEnableVertexAttribArray
-//    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_COLOR);
-    glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     glDrawArrays(GL_TRIANGLES, 0, 3);
     
