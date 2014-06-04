@@ -44,6 +44,8 @@ bool HelloWorld::init()
     glGenBuffers(1, &vertexVBO);
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
     
+    //nomalize the position
+    // -1 ~ 1
     float vertercies[] = { -1,-1,
         1, -1,
         0, 1};
@@ -84,13 +86,12 @@ void HelloWorld::onDraw()
     
     glProgram->use();
     
-    
-    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-    director->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-    
+    //order of the push matrix operation doesn't matter
     director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
     director->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
     
+    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    director->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
     
     //set uniform values, the order of the line is very important
     glProgram->setUniformsForBuiltins();
@@ -103,10 +104,6 @@ void HelloWorld::onDraw()
 //        size.width, 0,
 //        size.width / 2, size.height};
     
-    //nomalize the position
-    // -1 ~ 1
-   
-    
     
     
 //    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POSITION | GL::VERTEX_ATTRIB_FLAG_COLOR);
@@ -114,13 +111,17 @@ void HelloWorld::onDraw()
     glBindVertexArray(vao);
     
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-    glEnableVertexAttribArray(0);
+//    glEnableVertexAttribArray(0);
+    //the following calls not equal to  glEnableVertexAttribArray
+    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POSITION);
     glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     
     glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
     glEnableVertexAttribArray(1);
+    //the following calls not equal to  glEnableVertexAttribArray
+//    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_COLOR);
     glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
@@ -129,8 +130,8 @@ void HelloWorld::onDraw()
     CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 3);
     CHECK_GL_ERROR_DEBUG();
     
-    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
 }
 
