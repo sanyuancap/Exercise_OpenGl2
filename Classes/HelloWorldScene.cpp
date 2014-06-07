@@ -44,11 +44,10 @@ bool HelloWorld::init()
     glGenBuffers(1, &vertexVBO);
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
     
-    //nomalize the position
-    // -1 ~ 1
-    float vertercies[] = { -1,-1,
-        1, -1,
-        0, 1};
+    auto size = Director::getInstance()->getVisibleSize();
+    float vertercies[] = { 0,0,   //第一个点的坐标
+        size.width, 0,   //第二个点的坐标
+        size.width / 2, size.height};  //第三个点的坐标
     
     float color[] = { 0, 1,0, 1,  1,0,0, 1, 0, 0, 1, 1};
     
@@ -56,8 +55,6 @@ bool HelloWorld::init()
     GLuint positionLocation = glGetAttribLocation(program->getProgram(), "a_position");
     CCLOG("position =%d", positionLocation);
     glEnableVertexAttribArray(positionLocation);
-    //the following calls not equal to  glEnableVertexAttribArray
-    //    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POSITION);
     glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
     
@@ -68,11 +65,9 @@ bool HelloWorld::init()
     
     GLuint colorLocation = glGetAttribLocation(program->getProgram(), "a_color");
     glEnableVertexAttribArray(colorLocation);
-    //the following calls not equal to  glEnableVertexAttribArray
-    //    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_COLOR);
     glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
-   
+    program->autorelease();
 // 使用vao    http://blog.sina.com.cn/s/blog_4a657c5a01016f8s.html
     return true;
 }
@@ -92,23 +87,14 @@ void HelloWorld::visit(cocos2d::Renderer *renderer, const Mat4 &transform, bool 
 void HelloWorld::onDraw()
 {
     //question1: why the triangle goes to the up side
+    //如果使用对等矩阵，则三角形绘制会在最前面
     
     auto glProgram = getGLProgram();
     
-    auto director = Director::getInstance();
-    
     glProgram->use();
-    
-    //order of the push matrix operation doesn't matter
-    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
-    director->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
-    
-    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-    director->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
     
     //set uniform values, the order of the line is very important
     glProgram->setUniformsForBuiltins();
-   
     
     
     auto size = Director::getInstance()->getWinSize();
@@ -121,8 +107,6 @@ void HelloWorld::onDraw()
     CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 3);
     CHECK_GL_ERROR_DEBUG();
     
-    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
 }
 
