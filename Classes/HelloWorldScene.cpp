@@ -68,6 +68,10 @@ bool HelloWorld::init()
     glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
     program->autorelease();
+    
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
 // 使用vao    http://blog.sina.com.cn/s/blog_4a657c5a01016f8s.html
     return true;
 }
@@ -103,6 +107,8 @@ void HelloWorld::onDraw()
     glBindVertexArray(vao);
     
     glDrawArrays(GL_TRIANGLES, 0, 3);
+    
+    glBindVertexArray(0);
     
     CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 3);
     CHECK_GL_ERROR_DEBUG();
