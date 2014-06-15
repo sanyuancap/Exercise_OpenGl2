@@ -45,9 +45,9 @@ bool HelloWorld::init()
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
     
     auto size = Director::getInstance()->getVisibleSize();
-    float vertercies[] = { 0,0,   //第一个点的坐标
-        size.width, 0,   //第二个点的坐标
-        size.width / 2, size.height};  //第三个点的坐标
+    float vertercies[] = { -1,-1,   //第一个点的坐标
+        1, -1,   //第二个点的坐标
+        0, 1};  //第三个点的坐标
     
     float color[] = { 0, 1,0, 1,  1,0,0, 1, 0, 0, 1, 1};
     
@@ -57,7 +57,6 @@ bool HelloWorld::init()
     glEnableVertexAttribArray(positionLocation);
     glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
-    
     //set for color
     glGenBuffers(1, &colorVBO);
     glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
@@ -92,6 +91,11 @@ void HelloWorld::onDraw()
 {
     //question1: why the triangle goes to the up side
     //如果使用对等矩阵，则三角形绘制会在最前面
+    Director::getInstance()->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    Director::getInstance()->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    Director::getInstance()->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+    Director::getInstance()->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+
     
     auto glProgram = getGLProgram();
     
@@ -101,10 +105,16 @@ void HelloWorld::onDraw()
     glProgram->setUniformsForBuiltins();
     
     
+    
     auto size = Director::getInstance()->getWinSize();
     
     //use vao
     glBindVertexArray(vao);
+    
+    GLuint uColorLocation = glGetUniformLocation(glProgram->getProgram(), "u_color");
+    
+    float uColor[] = {1.0, 0.0, 0.0, 1.0};
+    glUniform4fv(uColorLocation,1, uColor);
     
     glDrawArrays(GL_TRIANGLES, 0, 3);
     
@@ -113,6 +123,9 @@ void HelloWorld::onDraw()
     CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 3);
     CHECK_GL_ERROR_DEBUG();
     
+    Director::getInstance()->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+    
+    Director::getInstance()->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 
 }
 
