@@ -119,7 +119,7 @@ void HelloWorld::onDraw()
     typedef struct {
         float Position[3];
         float Color[4];
-        float tex[2];
+        float TexCoord[2];
     } Vertex;
 #define TEX_COORD_MAX   1
 
@@ -234,25 +234,25 @@ void HelloWorld::onDraw()
     glEnableVertexAttribArray(_colorLocation);
     glEnableVertexAttribArray(_textureLocation);
     
-    glVertexAttribPointer(_positionLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    glVertexAttribPointer(_positionLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, Position));
     
-    glVertexAttribPointer(_colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),(GLvoid*)(sizeof(float) * 3));
+    glVertexAttribPointer(_colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),(GLvoid*)offsetof(Vertex, Color));
     
     glVertexAttribPointer(_textureLocation, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (GLvoid*)(sizeof(float) * 7));
+                          (GLvoid*)offsetof(Vertex, TexCoord));
 //
     //set sampler
     GL::bindTexture2D(_textureID);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
     
-    glDrawElements(GL_TRIANGLES,  18, GL_UNSIGNED_BYTE, 0);
+    glDrawElements(GL_TRIANGLES,  36, GL_UNSIGNED_BYTE, 0);
     
     mShaderProgram->setUniformLocationWith1i(_textureUniform, 0);
 
     
-    GL::bindTexture2D(_textureID2);
-    glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_BYTE, (void*)(18 * sizeof(GLubyte)));
+//    GL::bindTexture2D(_textureID2);
+//    glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_BYTE, (void*)(18 * sizeof(GLubyte)));
     
     
        mShaderProgram->setUniformLocationWith1i(_textureUniform, 0);
