@@ -2,6 +2,7 @@
 
 USING_NS_CC;
 
+
 Scene* HelloWorld::createScene()
 {
     // 'scene' is an autorelease object
@@ -41,30 +42,65 @@ bool HelloWorld::init()
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     
+
+    
+    typedef struct {
+        float Position[2];
+        float Color[4];
+    } Vertex;
+    
+//    auto size = Director::getInstance()->getVisibleSize();
+    Vertex data[] =
+    {
+        {-1,-1},
+        {0,1,0,1},
+        
+        {1,-1},
+        {0,1,0,1},
+        
+        {-1,1},
+        {0,1,0,1},
+
+        {1,1},
+        {0,1,0,1}
+    };
+    
+    GLubyte indices[] = { 0,1,2  //第一个三角形索引
+                       }; //第二个三角形索引
+
     glGenBuffers(1, &vertexVBO);
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-    
-    auto size = Director::getInstance()->getVisibleSize();
-    float vertercies[] = { -1,-1,   //第一个点的坐标
-        1, -1,   //第二个点的坐标
-        0, 1};  //第三个点的坐标
-    
-    float color[] = { 0, 1,0, 1,  1,0,0, 1, 0, 0, 1, 1};
-    
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertercies), vertercies, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
     GLuint positionLocation = glGetAttribLocation(program->getProgram(), "a_position");
-    CCLOG("position =%d", positionLocation);
+//    CCLOG("position =%d", positionLocation);
     glEnableVertexAttribArray(positionLocation);
-    glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+    
+    
+    glVertexAttribPointer(positionLocation,
+                          2,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(Vertex),
+                          (GLvoid*)offsetof(Vertex,Position));
 
     //set for color
-    glGenBuffers(1, &colorVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+//    glGenBuffers(1, &colorVBO);
+//    glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
     
     GLuint colorLocation = glGetAttribLocation(program->getProgram(), "a_color");
     glEnableVertexAttribArray(colorLocation);
-    glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+    glVertexAttribPointer(colorLocation,
+                          4,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(Vertex),
+                          (GLvoid*)offsetof(Vertex,Color));
+    
+    GLuint indexVBO;
+    glGenBuffers(1, &indexVBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices) , indices, GL_STATIC_DRAW);
 
     program->autorelease();
     
@@ -113,10 +149,11 @@ void HelloWorld::onDraw()
     
     GLuint uColorLocation = glGetUniformLocation(glProgram->getProgram(), "u_color");
     
-    float uColor[] = {1.0, 0.0, 0.0, 1.0};
+    float uColor[] = {1.0, 1.0, 1.0, 1.0};
     glUniform4fv(uColorLocation,1, uColor);
     
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+//    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE,(GLvoid*)0);
     
     glBindVertexArray(0);
     
