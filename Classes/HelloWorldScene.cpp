@@ -52,21 +52,17 @@ bool HelloWorld::init()
 //    auto size = Director::getInstance()->getVisibleSize();
     Vertex data[] =
     {
-        {-1,-1},
-        {0,1,0,1},
+        {{-1,-1},{0,1,0,1}},
         
-        {1,-1},
-        {0,1,0,1},
+        {{1,-1},{0,1,0,1}},
         
-        {-1,1},
-        {0,1,0,1},
+        { {-1,1},{0,1,0,1}},
 
-        {1,1},
-        {0,1,0,1}
+        {{1,1},{0,1,0,1}}
     };
     
-    GLubyte indices[] = { 0,1,2  //第一个三角形索引
-                       }; //第二个三角形索引
+    GLubyte indices[] = { 0,1,2,  //第一个三角形索引
+                       2,3,1}; //第二个三角形索引
 
     glGenBuffers(1, &vertexVBO);
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
@@ -153,11 +149,11 @@ void HelloWorld::onDraw()
     glUniform4fv(uColorLocation,1, uColor);
     
 //    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE,(GLvoid*)0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE,(GLvoid*)0);
     
     glBindVertexArray(0);
     
-    CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 3);
+    CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 6);
     CHECK_GL_ERROR_DEBUG();
     
     Director::getInstance()->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
