@@ -45,24 +45,65 @@ bool HelloWorld::init()
 
     
     typedef struct {
-        float Position[2];
+        float Position[3];
         float Color[4];
     } Vertex;
     
 //    auto size = Director::getInstance()->getVisibleSize();
     Vertex data[] =
     {
-        {{-1,-1},{0,1,0,1}},
-        
-        {{1,-1},{0,1,0,1}},
-        
-        { {-1,1},{0,1,0,1}},
-
-        {{1,1},{0,1,0,1}}
+        // Front
+        {{1, -1, 0}, {1, 0, 0, 1}},
+        {{1, 1, 0}, {0, 1, 0, 1}},
+        {{-1, 1, 0}, {0, 0, 1, 1}},
+        {{-1, -1, 0}, {0, 0, 0, 1}},
+        // Back
+        {{1, 1, -2}, {1, 0, 0, 1}},
+        {{-1, -1, -2}, {0, 1, 0, 1}},
+        {{1, -1, -2}, {0, 0, 1, 1}},
+        {{-1, 1, -2}, {0, 0, 0, 1}},
+        // Left
+        {{-1, -1, 0}, {1, 0, 0, 1}},
+        {{-1, 1, 0}, {0, 1, 0, 1}},
+        {{-1, 1, -2}, {0, 0, 1, 1}},
+        {{-1, -1, -2}, {0, 0, 0, 1}},
+        // Right
+        {{1, -1, -2}, {1, 0, 0, 1}},
+        {{1, 1, -2}, {0, 1, 0, 1}},
+        {{1, 1, 0}, {0, 0, 1, 1}},
+        {{1, -1, 0}, {0, 0, 0, 1}},
+        // Top
+        {{1, 1, 0}, {1, 0, 0, 1}},
+        {{1, 1, -2}, {0, 1, 0, 1}},
+        {{-1, 1, -2}, {0, 0, 1, 1}},
+        {{-1, 1, 0}, {0, 0, 0, 1}},
+        // Bottom
+        {{1, -1, -2}, {1, 0, 0, 1}},
+        {{1, -1, 0}, {0, 1, 0, 1}},
+        {{-1, -1, 0}, {0, 0, 1, 1}},
+        {{-1, -1, -2}, {0, 0, 0, 1}}
     };
     
-    GLubyte indices[] = { 0,1,2,  //第一个三角形索引
-                       2,3,1}; //第二个三角形索引
+    GLubyte indices[] = {
+        // Front
+        0, 1, 2,
+        2, 3, 0,
+        // Back
+        4, 5, 6,
+        4, 5, 7,
+        // Left
+        8, 9, 10,
+        10, 11, 8,
+        // Right
+        12, 13, 14,
+        14, 15, 12,
+        // Top
+        16, 17, 18,
+        18, 19, 16,
+        // Bottom
+        20, 21, 22,
+        22, 23, 20
+    }; 
 
     glGenBuffers(1, &vertexVBO);
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
@@ -73,7 +114,7 @@ bool HelloWorld::init()
     
     
     glVertexAttribPointer(positionLocation,
-                          2,
+                          3,
                           GL_FLOAT,
                           GL_FALSE,
                           sizeof(Vertex),
@@ -129,11 +170,34 @@ void HelloWorld::onDraw()
     Director::getInstance()->loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
     
+    Mat4 modelViewMatrix;
+    Mat4::createLookAt(Vec3(0,0,1), Vec3(0,0,0), Vec3(0,1,0), &modelViewMatrix);
+    
+    modelViewMatrix.translate(0, 0, -5);
+
+    static float rotation = 0;
+    modelViewMatrix.rotate(Vec3(1,1,1),CC_DEGREES_TO_RADIANS(rotation));
+    rotation++;
+    if (rotation > 360) {
+        rotation = 0;
+    }
+
+    
+    Mat4 projectionMatrix;
+    Mat4::createPerspective(60, 480/320, 1.0, 42, &projectionMatrix);
+    Director::getInstance()->multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, projectionMatrix);
+    
+    
+    Director::getInstance()->multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, modelViewMatrix);
+
+    
     auto glProgram = getGLProgram();
     
     glProgram->use();
     
     //set uniform values, the order of the line is very important
+    //method1
+   // glProgram->setUniformsForBuiltins(modelViewMatrix);
     glProgram->setUniformsForBuiltins();
     
     
@@ -149,11 +213,11 @@ void HelloWorld::onDraw()
     glUniform4fv(uColorLocation,1, uColor);
     
 //    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE,(GLvoid*)0);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE,(GLvoid*)0);
     
     glBindVertexArray(0);
     
-    CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 6);
+    CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, 36);
     CHECK_GL_ERROR_DEBUG();
     
     Director::getInstance()->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
