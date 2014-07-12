@@ -47,18 +47,19 @@ bool HelloWorld::init()
     typedef struct {
         float Position[2];
         float Color[4];
+        float TexCoord[2];
     } Vertex;
     
 //    auto size = Director::getInstance()->getVisibleSize();
     Vertex data[] =
     {
-        {{-1,-1},{0,1,0,1}},
+        {{-1,-1},{0,1,0,1},{0,1}},
         
-        {{1,-1},{0,1,0,1}},
+        {{1,-1},{0,1,0,1},{1,1}},
         
-        { {-1,1},{0,1,0,1}},
+        { {-1,1},{0,1,0,1},{0,0}},
 
-        {{1,1},{0,1,0,1}}
+        {{1,1},{0,1,0,1},{1,0}}
     };
     
     GLubyte indices[] = { 0,1,2,  //第一个三角形索引
@@ -93,11 +94,62 @@ bool HelloWorld::init()
                           sizeof(Vertex),
                           (GLvoid*)offsetof(Vertex,Color));
     
+    GLuint textureLocation = glGetAttribLocation(program->getProgram(), "a_coord");
+    glEnableVertexAttribArray(textureLocation);
+    glVertexAttribPointer(textureLocation, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, TexCoord));
+    
     GLuint indexVBO;
     glGenBuffers(1, &indexVBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices) , indices, GL_STATIC_DRAW);
+    
+    //method 1: the hard way
+    Image *image = new Image;
+    std::string imagePath = FileUtils::getInstance()->fullPathForFilename("HelloWorld.png");
+    image->initWithImageFile(imagePath);
+    
+//    glPixelStorei(GL_UNPACK_ALIGNMENT, 8);
 
+
+    glGenTextures(1, &textureId);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+//    GL::bindTexture2DN(1,textureId);
+
+
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+
+    
+    unsigned char *imageData = image->getData();
+    int width = image->getWidth();
+    int height = image->getHeight();
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGB,
+                 width,
+                 height,
+                 0,
+                 GL_RGB,
+                 GL_UNSIGNED_BYTE,//must be GL_UNSIGNED_BYTE
+                 imageData);
+    
+    
+//    //method2: the easier way
+//    Texture2D *texture = new Texture2D;
+//    texture->initWithImage(image);
+//    textureId = texture->getName();
+//    
+//    //method3: the easiest way
+//    Sprite *sprite = Sprite::create("HelloWorld.png");
+//    textureId = sprite->getTexture()->getName();
+    
+    CC_SAFE_DELETE(image);
+
+    
     program->autorelease();
     
     glBindVertexArray(0);
@@ -135,19 +187,25 @@ void HelloWorld::onDraw()
     
     //set uniform values, the order of the line is very important
     glProgram->setUniformsForBuiltins();
+    GLuint textureLocation = glGetUniformLocation(glProgram->getProgram(),"CC_Texture0");
+    glUniform1i(textureLocation, 0);
     
-    
+
     
     auto size = Director::getInstance()->getWinSize();
     
     //use vao
     glBindVertexArray(vao);
     
+
+    
     GLuint uColorLocation = glGetUniformLocation(glProgram->getProgram(), "u_color");
     
     float uColor[] = {1.0, 1.0, 1.0, 1.0};
     glUniform4fv(uColorLocation,1, uColor);
     
+    GL::bindTexture2D(textureId);
+
 //    glDrawArrays(GL_TRIANGLES, 0, 6);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE,(GLvoid*)0);
     
