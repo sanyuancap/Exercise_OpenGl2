@@ -251,8 +251,8 @@ void HelloWorld::onDraw()
     mShaderProgram->setUniformLocationWith1i(_textureUniform, 0);
 
     
-//    GL::bindTexture2D(_textureID2);
-//    glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_BYTE, (void*)(18 * sizeof(GLubyte)));
+    GL::bindTexture2D(_textureID2);
+    glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_BYTE, (void*)(18 * sizeof(GLubyte)));
     
     
        mShaderProgram->setUniformLocationWith1i(_textureUniform, 0);

@@ -6,7 +6,7 @@
 
 */
 
-varying lowp vec4 DestinationColor; // 1
+varying  vec4 DestinationColor; // 1
 
 uniform sampler2D CC_Texture0;
 varying vec2 v_texCoord;

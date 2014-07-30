@@ -25,6 +25,8 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
+		29BEF76019888928002949E0 /* myshader.vert in Resources */ = {isa = PBXBuildFile; fileRef = 29BF390818F41598008A6B6A /* myshader.vert */; };
+		29BEF76119888929002949E0 /* myshader.frag in Resources */ = {isa = PBXBuildFile; fileRef = 29BF390C18F415AA008A6B6A /* myshader.frag */; };
 		29BF390918F41598008A6B6A /* myshader.vert in Resources */ = {isa = PBXBuildFile; fileRef = 29BF390818F41598008A6B6A /* myshader.vert */; };
 		29BF390D18F415AA008A6B6A /* myshader.frag in Resources */ = {isa = PBXBuildFile; fileRef = 29BF390C18F415AA008A6B6A /* myshader.frag */; };
 		503AE0F817EB97AB00D1A890 /* Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 503AE0F617EB97AB00D1A890 /* Icon.icns */; };
@@ -661,6 +663,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29BEF76019888928002949E0 /* myshader.vert in Resources */,
+				29BEF76119888929002949E0 /* myshader.frag in Resources */,
 				5087E75317EB910900C73F5D /* CloseNormal.png in Resources */,
 				503AE0F817EB97AB00D1A890 /* Icon.icns in Resources */,
 				5087E75417EB910900C73F5D /* CloseSelected.png in Resources */,
